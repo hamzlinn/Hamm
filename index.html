@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HAMM IDK Downloader</title>
+
+<style>
+body {
+  margin: 0;
+  font-family: Arial;
+  background: #0f0f0f;
+  color: white;
+  text-align: center;
+}
+
+/* HEADER */
+.logo {
+  margin-top: 60px;
+  font-size: 34px;
+  font-weight: bold;
+  background: linear-gradient(90deg,#00ffcc,#1db954);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.sub {
+  opacity: 0.6;
+}
+
+/* INPUT */
+input {
+  width: 80%;
+  max-width: 400px;
+  padding: 14px;
+  border-radius: 12px;
+  border: none;
+  margin-top: 20px;
+}
+
+/* BUTTON */
+button {
+  padding: 14px 25px;
+  margin-top: 10px;
+  border: none;
+  border-radius: 12px;
+  background: linear-gradient(90deg,#00ffcc,#1db954);
+  font-weight: bold;
+  cursor: pointer;
+}
+
+/* LOADING */
+.loader {
+  margin-top: 20px;
+  border: 4px solid #333;
+  border-top: 4px solid #1db954;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  100% { transform: rotate(360deg); }
+}
+
+/* VIDEO */
+video {
+  margin-top: 20px;
+  width: 90%;
+  max-width: 400px;
+  border-radius: 12px;
+}
+
+/* DOWNLOAD BTN */
+.download-btn {
+  display: inline-block;
+  margin-top: 15px;
+  padding: 12px 20px;
+  background: #1db954;
+  border-radius: 10px;
+  text-decoration: none;
+  color: black;
+  font-weight: bold;
+}
+
+/* STATS */
+.stats {
+  margin-top: 20px;
+  opacity: 0.7;
+}
+
+/* FOOTER */
+.footer {
+  position: fixed;
+  bottom: 10px;
+  width: 100%;
+  opacity: 0.4;
+}
+</style>
+
+</head>
+<body>
+
+<div class="logo">HAMM IDK</div>
+<div class="sub">Fast TikTok Downloader • No Watermark</div>
+
+<input type="text" id="link" placeholder="Paste link TikTok...">
+<br>
+<button onclick="start()">DOWNLOAD</button>
+
+<div id="result"></div>
+
+<div class="stats">
+🔥 <span id="count">1,284,392</span> downloads today
+</div>
+
+<div class="footer">⚡ by hamm</div>
+
+<script>
+// FAKE COUNTER
+setInterval(() => {
+  let el = document.getElementById("count");
+  el.innerText = parseInt(el.innerText.replace(/,/g,'')) + Math.floor(Math.random()*5);
+}, 2000);
+
+// AUTO PASTE DETECT
+document.getElementById("link").addEventListener("paste", () => {
+  setTimeout(start, 500);
+});
+
+// MULTI API
+const APIs = [
+  async (url) => {
+    const res = await fetch(`https://api.tiklydown.eu.org/api/download?url=${url}`);
+    const data = await res.json();
+    return data.video.noWatermark;
+  },
+  async (url) => {
+    const res = await fetch(`https://api.douyin.wtf/api?url=${url}`);
+    const data = await res.json();
+    return data.play;
+  }
+];
+
+async function start() {
+  const url = document.getElementById("link").value;
+  const result = document.getElementById("result");
+
+  result.innerHTML = `<div class="loader"></div>`;
+
+  for (let api of APIs) {
+    try {
+      const videoUrl = await api(url);
+
+      result.innerHTML = `
+        <video controls src="${videoUrl}"></video>
+        <br>
+        <a class="download-btn" href="${videoUrl}" download>⬇ Download</a>
+      `;
+      return;
+    } catch(e) {}
+  }
+
+  result.innerHTML = "❌ Server sibuk, coba lagi!";
+}
+</script>
+
+</body>
+</html>
